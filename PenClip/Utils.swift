@@ -38,8 +38,9 @@ extension UserDefaults {
 }
 
 class ImageSaver: NSObject {
+    let scale = UnsafeMutableRawPointer(bitPattern: 2)
     func writeToPhotoAlbum(image: UIImage) {
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), nil)
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), scale)
     }
     
     @objc func saveError(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {

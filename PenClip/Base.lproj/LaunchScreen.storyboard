@@ -16,24 +16,24 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="Splash" translatesAutoresizingMaskIntoConstraints="NO" id="oTG-gu-HQW">
-                                <rect key="frame" x="63" y="330" width="289" height="289"/>
-                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="default"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="128" verticalHuggingPriority="128" horizontalCompressionResistancePriority="128" verticalCompressionResistancePriority="128" image="Splash" id="oTG-gu-HQW">
+                                <rect key="frame" x="149" y="359" width="117" height="178"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <viewLayoutGuide key="safeArea" id="L3O-3B-DQ0"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" name="BGColor"/>
                         <constraints>
-                            <constraint firstItem="oTG-gu-HQW" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="LY8-OH-n0b"/>
-                            <constraint firstItem="oTG-gu-HQW" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="N0g-lk-rlU"/>
-                            <constraint firstItem="oTG-gu-HQW" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="bEC-Cy-dlb"/>
-                            <constraint firstItem="oTG-gu-HQW" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="bhL-me-6y2"/>
+                            <constraint firstItem="oTG-gu-HQW" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="0ye-PI-cdl"/>
+                            <constraint firstItem="oTG-gu-HQW" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="oxZ-nG-plE"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="50.724637681159422" y="374.33035714285711"/>
+            <point key="canvasLocation" x="50.390625" y="374.23133235724742"/>
         </scene>
     </scenes>
     <resources>

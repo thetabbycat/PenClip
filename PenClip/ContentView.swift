@@ -14,6 +14,10 @@ let statusBarHeight = window?.windowScene?.statusBarManager?.statusBarFrame.heig
 let screen = UIScreen.main.bounds
 
 struct ContentView: View {
+    
+    init() {
+        window?.overrideUserInterfaceStyle = .light
+    }
     var body: some View {
         Canvas()
     }
