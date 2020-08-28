@@ -21,6 +21,7 @@ struct Canvas: View {
     var isIpad = UIDevice.current.model.hasPrefix("iPad")
     var today = Date()
     var dateFormatter = DateFormatter()
+    
     @State var show = false
     @State var editMode = false
     @State var currentScale: CGFloat = 1
@@ -32,7 +33,7 @@ struct Canvas: View {
     var body: some View {
         ZStack {
             ZStack {
-                PKCanvas(color: self.$color, clear: self.$clear)
+                PKCanvas(color: UIColor(named: "PencilColor")!, clear: self.$clear)
                     .edgesIgnoringSafeArea(.all)
                     .frame(width: screen.width, height: screen.height)
                     .aspectRatio(contentMode: ContentMode.fill)
@@ -55,10 +56,10 @@ struct Canvas: View {
 
                                     //  let newOffsetWidth = self.currentOffset.width + deltaX / self.currentScale
                                     //  if newOffsetWidth <= geometry.size.width - 50.0 && newOffsetWidth > -50.0 {
-                                    withAnimation(.linear(duration: 0.3)) { self.currentOffset.width = self.currentOffset.width + deltaX / self.currentScale }
+                                    withAnimation(.linear(duration: 0.3)) { self.currentOffset.width = self.currentOffset.width + deltaX * self.currentScale }
                                     //   }
 
-                                    withAnimation(.linear(duration: 0.3)) { self.currentOffset.height = self.currentOffset.height + deltaY / self.currentScale }
+                                    withAnimation(.linear(duration: 0.3)) { self.currentOffset.height = self.currentOffset.height + deltaY * self.currentScale }
                                 }
                                 .onEnded { _ in self.previousOffset = CGSize.zero })
                             .simultaneousGesture(MagnificationGesture()
@@ -169,7 +170,7 @@ struct Canvas: View {
     }
 
     func saveImage() {
-        let inputImage = canvas.drawing.image(from: imgRect, scale: 1)
+        let inputImage = canvas.drawing.image(from: imgRect, scale: UIScreen.main.scale / 2).imageWithColor(tintColor: UIColor(named: "PaperBG")!)
         imageSaver.writeToPhotoAlbum(image: inputImage)
     }
 }

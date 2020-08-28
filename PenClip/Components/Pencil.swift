@@ -22,7 +22,7 @@ struct PKCanvas: UIViewRepresentable {
         }
     }
 
-    @Binding var color: UIColor
+    var color: UIColor
     @Binding var clear: Bool
 
     func makeCoordinator() -> Coordinator {
@@ -32,10 +32,12 @@ struct PKCanvas: UIViewRepresentable {
     func makeUIView(context: Context) -> PKCanvasView {
         canvas.tool = PKInkingTool(.pen, color: color, width: 10)
         canvas.delegate = context.coordinator
-        canvas.becomeFirstResponder()
+    //    canvas.becomeFirstResponder()
         canvas.isOpaque = false
-        canvas.backgroundColor = UIColor.clear
-        canvas.overrideUserInterfaceStyle = .light
+        canvas.isScrollEnabled = false
+        canvas.backgroundColor = .clear
+      //  canvas.backgroundColor = self.bg
+      //  canvas.overrideUserInterfaceStyle = .light
         canvas.becomeFirstResponder()
 
         if let window = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first,

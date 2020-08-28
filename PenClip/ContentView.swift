@@ -15,9 +15,9 @@ let screen = UIScreen.main.bounds
 
 struct ContentView: View {
     
-    init() {
-        window?.overrideUserInterfaceStyle = .light
-    }
+  //  init() {
+    //    window?.overrideUserInterfaceStyle = .light
+ //   }
     var body: some View {
         Canvas()
     }
