@@ -12,6 +12,7 @@ import UIKit
 
 let canvas = PKCanvasView(frame: screen)
 let imgRect = CGRect(x: 0, y: 0, width: screen.width, height: screen.height)
+
 struct PKCanvas: UIViewRepresentable {
     class Coordinator: NSObject, PKCanvasViewDelegate {
         var pkCanvas: PKCanvas
@@ -24,6 +25,7 @@ struct PKCanvas: UIViewRepresentable {
 
     var color: UIColor
     @Binding var clear: Bool
+    var state = settings.data(forKey: "drawingState2")
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -38,6 +40,16 @@ struct PKCanvas: UIViewRepresentable {
         canvas.backgroundColor = .clear
       //  canvas.backgroundColor = self.bg
       //  canvas.overrideUserInterfaceStyle = .light
+        
+        
+        do {
+            if ((self.state) != nil) {
+                canvas.drawing = try PKDrawing(data: self.state!)
+            }
+            
+    } catch {
+    print("error")
+    }
         canvas.becomeFirstResponder()
 
         if let window = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first,
@@ -52,8 +64,14 @@ struct PKCanvas: UIViewRepresentable {
 
     func updateUIView(_ canvasView: PKCanvasView, context: Context) {
         if clear != context.coordinator.pkCanvas.clear {
+           // canvasView.drawing = PKDrawing()
+            print("hi")
+        }
+        
+        if (clear == true) {
             canvasView.drawing = PKDrawing()
         }
+        
         canvasView.tool = PKInkingTool(.pen, color: color, width: 10)
     }
 }
