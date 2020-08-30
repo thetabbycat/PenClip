@@ -19,7 +19,6 @@ struct PKCanvas: UIViewRepresentable {
 
         init(_ pkCanvas: PKCanvas) {
             self.pkCanvas = pkCanvas
-             
         }
     }
 
@@ -34,22 +33,21 @@ struct PKCanvas: UIViewRepresentable {
     func makeUIView(context: Context) -> PKCanvasView {
         canvas.tool = PKInkingTool(.pen, color: color, width: 10)
         canvas.delegate = context.coordinator
-    //    canvas.becomeFirstResponder()
+        //    canvas.becomeFirstResponder()
         canvas.isOpaque = false
         canvas.isScrollEnabled = false
         canvas.backgroundColor = .clear
-      //  canvas.backgroundColor = self.bg
-      //  canvas.overrideUserInterfaceStyle = .light
-        
-        
+        //  canvas.backgroundColor = self.bg
+        //  canvas.overrideUserInterfaceStyle = .light
+
         do {
-            if ((self.state) != nil) {
-                canvas.drawing = try PKDrawing(data: self.state!)
+            if state != nil {
+                canvas.drawing = try PKDrawing(data: state!)
             }
-            
-    } catch {
-    print("error")
-    }
+
+        } catch {
+            print("error")
+        }
         canvas.becomeFirstResponder()
 
         if let window = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first,
@@ -64,14 +62,13 @@ struct PKCanvas: UIViewRepresentable {
 
     func updateUIView(_ canvasView: PKCanvasView, context: Context) {
         if clear != context.coordinator.pkCanvas.clear {
-           // canvasView.drawing = PKDrawing()
-            print("hi")
+            //  print("hi")
         }
-        
-        if (clear == true) {
+
+        if clear == true {
             canvasView.drawing = PKDrawing()
         }
-        
+
         canvasView.tool = PKInkingTool(.pen, color: color, width: 10)
     }
 }

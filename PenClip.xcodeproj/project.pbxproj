@@ -19,7 +19,23 @@
 		0A33036D24D9E1E60048646D /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A33036C24D9E1E60048646D /* Utils.swift */; };
 		0A33036F24D9E1FB0048646D /* Canvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A33036E24D9E1FB0048646D /* Canvas.swift */; };
 		0AD7878124FA8588004375A2 /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD7878024FA8588004375A2 /* BlurView.swift */; };
+		0AD7878824FAA99F004375A2 /* Jost-500-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0AD7878724FAA99F004375A2 /* Jost-500-Medium.ttf */; };
+		0AD7878924FAA9A4004375A2 /* Jost-500-Medium.ttf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0AD7878724FAA99F004375A2 /* Jost-500-Medium.ttf */; };
+		0AD7878B24FACFB5004375A2 /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD7878A24FACFB5004375A2 /* Menu.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0AD7878524FAA95B004375A2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Fonts;
+			dstSubfolderSpec = 7;
+			files = (
+				0AD7878924FAA9A4004375A2 /* Jost-500-Medium.ttf in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0A1593D024D9E2A90063CE8A /* Pencil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pencil.swift; sourceTree = "<group>"; };
@@ -36,6 +52,8 @@
 		0A33036C24D9E1E60048646D /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		0A33036E24D9E1FB0048646D /* Canvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Canvas.swift; sourceTree = "<group>"; };
 		0AD7878024FA8588004375A2 /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
+		0AD7878724FAA99F004375A2 /* Jost-500-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Jost-500-Medium.ttf"; sourceTree = "<group>"; };
+		0AD7878A24FACFB5004375A2 /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +86,7 @@
 		0A33035224D9E1BC0048646D /* PenClip */ = {
 			isa = PBXGroup;
 			children = (
+				0AD7878224FAA8DD004375A2 /* Fonts */,
 				0A33036B24D9E1D80048646D /* Components */,
 				0A33036A24D9E1CD0048646D /* View */,
 				0A33035324D9E1BC0048646D /* AppDelegate.swift */,
@@ -105,8 +124,17 @@
 				0A1593D024D9E2A90063CE8A /* Pencil.swift */,
 				0A1593D224D9E2F00063CE8A /* Button.swift */,
 				0AD7878024FA8588004375A2 /* BlurView.swift */,
+				0AD7878A24FACFB5004375A2 /* Menu.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		0AD7878224FAA8DD004375A2 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				0AD7878724FAA99F004375A2 /* Jost-500-Medium.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -119,6 +147,7 @@
 				0A33034C24D9E1BC0048646D /* Sources */,
 				0A33034D24D9E1BC0048646D /* Frameworks */,
 				0A33034E24D9E1BC0048646D /* Resources */,
+				0AD7878524FAA95B004375A2 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -136,7 +165,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1140;
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "Steven J. Selcuk";
 				TargetAttributes = {
 					0A33034F24D9E1BC0048646D = {
@@ -170,6 +199,7 @@
 				0A33036324D9E1BE0048646D /* LaunchScreen.storyboard in Resources */,
 				0A33036024D9E1BE0048646D /* Preview Assets.xcassets in Resources */,
 				0A33035D24D9E1BE0048646D /* Assets.xcassets in Resources */,
+				0AD7878824FAA99F004375A2 /* Jost-500-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,6 +214,7 @@
 				0A33035424D9E1BC0048646D /* AppDelegate.swift in Sources */,
 				0A33035624D9E1BC0048646D /* SceneDelegate.swift in Sources */,
 				0A1593D324D9E2F00063CE8A /* Button.swift in Sources */,
+				0AD7878B24FACFB5004375A2 /* Menu.swift in Sources */,
 				0A33035B24D9E1BC0048646D /* ContentView.swift in Sources */,
 				0AD7878124FA8588004375A2 /* BlurView.swift in Sources */,
 				0A33035924D9E1BC0048646D /* DrawItNow.xcdatamodeld in Sources */,
@@ -232,6 +263,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -292,6 +324,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

@@ -6,9 +6,9 @@
 //  Copyright © 2020 Steven J. Selcuk. All rights reserved.
 //
 import Foundation
+import PencilKit
 import SwiftUI
 import UIKit
-import PencilKit
 
 struct Canvas: View {
     @State var color = UIColor.black
@@ -25,7 +25,6 @@ struct Canvas: View {
     var dateFormatter = DateFormatter()
     @State var state = settings.data(forKey: "drawingState2")
 
-    
     @State var show = false
     @State var editMode = false
     @State var currentScale: CGFloat = 1
@@ -34,8 +33,57 @@ struct Canvas: View {
     @State var previousOffset = CGSize.zero
     @State var degree = 0.0
     @State var isSaved = AutoSave().isSaved
-
+    // Default position for draggable circle menu (its now at upper right corner)
+    @State private var dragAmount: CGPoint? = CGPoint(x: screen.width - (screen.width / 2 ), y: 80)
+    @State var morphing = false
+    
     var body: some View {
+        let textButtons = [
+
+            AnyView(IconButton(imageName: "trash", color: Color(hex: "DE316A"), buttonText: "Clear")
+                .onTapGesture {
+                    self.clear = false
+                    if self.clear == false {
+                        self.clear = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            self.clear = false
+                            self.saver.saveState()
+                        }
+                        //     if let appDomain = Bundle.main.bundleIdentifier {
+                        //         UserDefaults.standard.removePersistentDomain(forName: appDomain)
+                        //     }
+                    }
+                }),
+            AnyView(IconButton(imageName: self.editMode ? "scribble" : "crop.rotate", color: Color(hex: "326BF1"), buttonText: self.editMode ? "Draw" : "Arrange")
+                        .onTapGesture {
+                            self.saver.saveState()
+                            self.editMode.toggle()
+                        }),
+            AnyView(IconButton(imageName: "tray.2", color: Color(hex: "6F39DE"), buttonText: self.saver.isSaved ? "Saved" : "Save")
+                .onTapGesture {
+                    self.saver.saveState()
+                }),
+            AnyView(IconButton(imageName: "square.and.arrow.up", color: Color(hex: "6BDFDB"), buttonText: "Export")
+                .onTapGesture {
+                    self.saver.saveState()
+                    self.saveImage()
+                    self.savePopup = true
+                }),
+        ]
+
+        let mainButton1 = AnyView(MainButton(imageName: "circle.grid.hex", colorHex: "f7b731", dragging: self.morphing, width: 80))
+
+        let menu1 = FloatingButton(mainButtonView: mainButton1, buttons: textButtons)
+            .circle()
+            .spacing(20)
+            .startAngle(1 * .pi)
+            .endAngle(6 * .pi)
+            .animation(.spring())
+            .radius(90)
+            .delays(delayDelta: 0.1)
+            .initialOpacity(0)
+            .initialScaling(0.1)
+
         ZStack {
             ZStack {
                 PKCanvas(color: UIColor(named: "PencilColor")!, clear: self.$clear)
@@ -70,9 +118,9 @@ struct Canvas: View {
                                 .onChanged { value in
                                     let delta = value / self.previousScale
                                     self.previousScale = value
-                                    withAnimation(.easeInOut(duration: 1.3)) { self.currentScale = self.currentScale * delta }
+                                    withAnimation(.linear(duration: 1.3)) { self.currentScale = self.currentScale * delta }
                                 }
-                                .onEnded { _ in withAnimation(.easeInOut(duration: 0.5)) { self.previousScale = 1.0 } })
+                                .onEnded { _ in withAnimation(.linear(duration: 0.5)) { self.previousScale = 1.0 } })
                             .simultaneousGesture(RotationGesture()
                                 .onChanged({ angle in
                                     withAnimation(.linear(duration: 1.3)) { self.degree = angle.degrees }
@@ -85,114 +133,22 @@ struct Canvas: View {
             .scaleEffect(max(self.currentScale, 0.6))
             .rotationEffect(Angle.degrees(self.degree))
 
-            HStack(alignment: .center, spacing: 10) {
-                
-                Text("Menu")
-                
-                Button(action: {
-                    self.saver.saveState()
-                    self.editMode.toggle()
-                }) {
-                    VStack(alignment: .center) {
-                        Image(self.editMode ? "Pen" : "Arrange")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: isIpad ? 32 : 28, height: isIpad ? 32 : 28)
-                            .contentShape(Circle())
-                        Text(self.editMode ? "Draw" : "Arrange")
-                            .font(.callout)
-                            .foregroundColor(Color("TextColor"))
-                    }
-                }
-                .buttonStyle(GoodButtonStyle())
-
-                Button(action: {
-                    self.clear = false
-                    if self.clear == false {
-                        self.clear = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            self.clear = false
-                            self.saver.saveState()
-                        }
-                   //     if let appDomain = Bundle.main.bundleIdentifier {
-                   //         UserDefaults.standard.removePersistentDomain(forName: appDomain)
-                   //     }
-                    }
-
-                }) {
-                    VStack(alignment: .center) {
-                        Image("Eraser")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: isIpad ? 32 : 28, height: isIpad ? 32 : 28)
-                            .contentShape(Circle())
-                        Text("Clear")
-                            .font(.callout)
-                            .foregroundColor(Color("TextColor"))
-                    }
-                }
-                .buttonStyle(GoodButtonStyle())
-                
-                Button(action: {
-                    self.saver.saveState()
-                }) {
-                    VStack(alignment: .center) {
-                        Image("Export")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: isIpad ? 32 : 28, height: isIpad ? 32 : 28)
-                            .contentShape(Circle())
-                        Text(self.saver.isSaved ? "Saved" : "Save")
-                            .font(.callout)
-                            .foregroundColor(Color("TextColor"))
-                    }
-                }
-                .buttonStyle(GoodButtonStyle())
-
-                Button(action: {
-                    self.saver.saveState()
-                    self.saveImage()
-                    self.savePopup = true
-                }) {
-                    VStack(alignment: .center) {
-                        Image("Export")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: isIpad ? 32 : 28, height: isIpad ? 32 : 28)
-                            .contentShape(Circle())
-                        Text("Export")
-                            .font(.callout)
-                            .foregroundColor(Color("TextColor"))
-                    }
-                }
-                .buttonStyle(GoodButtonStyle())
-
+            GeometryReader { gp in
+                menu1
+                    .scaleEffect(self.morphing ? 1.4 : 1)
+                    .animation(.easeInOut)
+                    .position(self.dragAmount ?? CGPoint(x: gp.size.width / 2, y: gp.size.height / 2))
+                    .highPriorityGesture(
+                        DragGesture()
+                            .onChanged {
+                                self.dragAmount = $0.location
+                                self.morphing = true
+                            }
+                            .onEnded { _ in
+                                self.morphing = false
+                            }
+                    )
             }
-            .padding(.all)
-            .background(BlurView(style: .systemUltraThinMaterial))
-            .cornerRadius(3)
-            .offset(x: screen.width / 2 - (isIpad ? self.show ? 260 : -200 : self.show ? 200 : 20), y: -screen.height / 2 + (isIpad ? 100 : 80))
-            .animation(.easeInOut(duration: 0.4))
-            .gesture(DragGesture(minimumDistance: 10, coordinateSpace: .local)
-                        .onEnded({ value in
-                            if value.translation.width < 10 {
-                                self.show = true
-                            }
-                            
-                            if value.translation.width > 10 {
-                                self.show = false
-                            }
-                            if value.translation.height < 10 {
-                                // up
-                            }
-                            
-                            if value.translation.height > 0 {
-                                // down
-                            }
-                        }))
-            
-            
-            
         }
         .alert(isPresented: $savePopup) {
             Alert(title: Text("🎉 You are awesome! "), message: Text("Your masterpiece has been saved. "), primaryButton: .default(Text("See image")) {
@@ -206,34 +162,87 @@ struct Canvas: View {
         }
         .onAppear {
             do {
-                if ((self.state) != nil) {
+                if self.state != nil {
                     canvas.drawing = try PKDrawing(data: self.state!)
                 }
-                
+
             } catch {
                 print("error")
             }
         }
     }
-    
 
-
+    /// This function creates a PNG image
+    ///
+    /// Usage:
+    ///
+    ///     saveImage()
+    ///
+    /// - Parameter subject: The subject to be welcomed.
+    ///
+    /// - Returns: Creates a PNG file to users Photo album with a background `subject`.
+    ///
+    ///  - Note:[Reference](https://stackoverflow.com)
+    ///
+    ///  - Todo: Do stuff
+    ///
+    ///  - Important: make sure to do something ....
+    ///
+    ///  - Version: 0.1
     func saveImage() {
+        // We gonna get drawing data from canvas. To full supporting mark mode we need to add a background color which depends mode
+        // @SEE utils for functions & extensions.
+        // @SEE Assets for Paper BG color
+
         let inputImage = canvas.drawing.image(from: imgRect, scale: UIScreen.main.scale / 2).imageWithColor(tintColor: UIColor(named: "PaperBG")!)
         imageSaver.writeToPhotoAlbum(image: inputImage)
     }
 }
 
-struct ShareSheet: UIViewControllerRepresentable {
-    typealias UIViewControllerType = UIActivityViewController
+struct MainButton: View {
+    var imageName: String
+    var colorHex: String
+    var dragging: Bool
+    var width: CGFloat = 50
 
-    var sharing: [Any]
-
-    func makeUIViewController(context: UIViewControllerRepresentableContext<ShareSheet>) -> UIActivityViewController {
-        UIActivityViewController(activityItems: sharing, applicationActivities: nil)
-    }
-
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ShareSheet>) {
+    var body: some View {
+        ZStack {
+            Color(hex: colorHex)
+                .frame(width: width, height: width)
+                .cornerRadius(width / 2)
+                .shadow(color: Color(hex: colorHex).opacity(self.dragging ? 0.6 :  0.4 ), radius: 12, x: 0, y: 0)
+            Image(systemName: imageName)
+                .resizable()
+                .foregroundColor(.white)
+                .frame(minWidth: 28, idealWidth: 32, maxWidth: 32, minHeight: 28, idealHeight: 32, maxHeight: 32, alignment: .center)
+        }
     }
 }
 
+struct IconButton: View {
+    var imageName: String
+    var color: Color
+    var buttonText: String
+
+    let imageWidth: CGFloat = 20
+    let buttonWidth: CGFloat = 45
+
+    var body: some View {
+        ZStack {
+            ZStack {
+                self.color
+                Image(systemName: imageName)
+                    .frame(width: self.imageWidth, height: self.imageWidth)
+                    .foregroundColor(.white)
+                    .animation(nil)
+            }
+            .frame(width: self.buttonWidth, height: self.buttonWidth)
+            .cornerRadius(self.buttonWidth / 2)
+            Text(buttonText)
+                .foregroundColor(Color("MenuItemTextColor"))
+                .font(.custom("Jost Medium", size: 12))
+                .padding(.top, 65)
+                .animation(nil)
+        }
+    }
+}

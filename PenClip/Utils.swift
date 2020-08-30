@@ -7,11 +7,10 @@
 //
 
 import Foundation
+import PencilKit
 import SwiftUI
 import UIKit
-import PencilKit
 extension UserDefaults {
-    
     public func optionalString(forKey defaultName: String) -> String? {
         let defaults = self
         if let value = defaults.value(forKey: defaultName) {
@@ -19,8 +18,7 @@ extension UserDefaults {
         }
         return nil
     }
-    
-    
+
     public func optionalInt(forKey defaultName: String) -> Int? {
         let defaults = self
         if let value = defaults.value(forKey: defaultName) {
@@ -28,7 +26,7 @@ extension UserDefaults {
         }
         return nil
     }
-    
+
     public func optionalBool(forKey defaultName: String) -> Bool? {
         let defaults = self
         if let value = defaults.value(forKey: defaultName) {
@@ -39,84 +37,76 @@ extension UserDefaults {
 }
 
 class ImageSaver: NSObject {
-    let scale = UnsafeMutableRawPointer(bitPattern: Int(UIScreen.main.scale / 2))
     func writeToPhotoAlbum(image: UIImage) {
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), scale)
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), nil)
     }
-    
+
     @objc func saveError(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        print("Image Saved.")
-     //   UIApplication.shared.open(URL(string:"photos-redirect://")!)
+        //   UIApplication.shared.open(URL(string:"photos-redirect://")!)
     }
 }
 
 class AutoSave: ObservableObject {
-    
     @Published var isSaved = false
-    
+
     init() {
         let date = Date().addingTimeInterval(60)
-        let timer = Timer(fireAt: date, interval: 60, target: self, selector: #selector(self.saveState), userInfo: nil, repeats: true)
+        let timer = Timer(fireAt: date, interval: 60, target: self, selector: #selector(saveState), userInfo: nil, repeats: true)
         RunLoop.main.add(timer, forMode: .common)
     }
-    
+
     @objc public func saveState() {
         let data = canvas.drawing.dataRepresentation()
         settings.set(data, forKey: "drawingState2")
-        self.isSaved = true
+        isSaved = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             self.isSaved = false
         }
-        print("State saved.")
+      //  print("State saved.")
     }
 }
-
 
 class UIActivityViewControllerHost: UIViewController {
     var message = ""
-    var completionWithItemsHandler: UIActivityViewController.CompletionWithItemsHandler? = nil
-    
+    var completionWithItemsHandler: UIActivityViewController.CompletionWithItemsHandler?
+
     override func viewDidAppear(_ animated: Bool) {
         share()
     }
-    
+
     func share() {
         // set up activity view controller
-        let textToShare = [ message ]
+        let textToShare = [message]
         let activityViewController = UIActivityViewController(activityItems: textToShare, applicationActivities: nil)
-        
-        
+
         activityViewController.completionWithItemsHandler = completionWithItemsHandler
-        activityViewController.popoverPresentationController?.sourceView = self.view // so that iPads won't crash
-        
-        
+        activityViewController.popoverPresentationController?.sourceView = view // so that iPads won't crash
+
         // present the view controller
-        self.present(activityViewController, animated: true, completion: nil)
+        present(activityViewController, animated: true, completion: nil)
     }
 }
-
 
 struct ActivityViewController: UIViewControllerRepresentable {
     @Binding var text: String
     @Binding var showing: Bool
-    
+
     func makeUIViewController(context: Context) -> UIActivityViewControllerHost {
         // Create the host and setup the conditions for destroying it
         let result = UIActivityViewControllerHost()
-        
-        result.completionWithItemsHandler = { (activityType, completed, returnedItems, error) in
+
+        result.completionWithItemsHandler = { _, _, _, _ in
             // To indicate to the hosting view this should be "dismissed"
             self.showing = false
         }
-        
+
         return result
     }
-    
+
     func updateUIViewController(_ uiViewController: UIActivityViewControllerHost, context: Context) {
         // Update the text in the hosting controller
         uiViewController.message = text
     }
-    
 }
 
 extension UIView {
@@ -128,21 +118,20 @@ extension UIView {
     }
 }
 
-
 struct RectGetter: View {
     @Binding var rect: CGRect
-    
+
     var body: some View {
         GeometryReader { proxy in
             self.createView(proxy: proxy)
         }
     }
-    
+
     func createView(proxy: GeometryProxy) -> some View {
         DispatchQueue.main.async {
             self.rect = proxy.frame(in: .global)
         }
-        
+
         return Rectangle().fill(Color.clear)
     }
 }
@@ -150,16 +139,44 @@ struct RectGetter: View {
 extension UIImage {
     func imageWithColor(tintColor: UIColor) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(size, true, scale)
-        
+
         guard let ctx = UIGraphicsGetCurrentContext(), let image = cgImage else { return self }
         defer { UIGraphicsEndImageContext() }
-        
+
         let rect = CGRect(origin: .zero, size: size)
         ctx.setFillColor(tintColor.cgColor)
         ctx.fill(rect)
         ctx.concatenate(CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: size.height))
         ctx.draw(image, in: rect)
-        
+
         return UIGraphicsGetImageFromCurrentImageContext() ?? self
+    }
+}
+
+struct ShareSheet: UIViewControllerRepresentable {
+    typealias UIViewControllerType = UIActivityViewController
+
+    var sharing: [Any]
+
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ShareSheet>) -> UIActivityViewController {
+        UIActivityViewController(activityItems: sharing, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ShareSheet>) {
+    }
+}
+
+
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex)
+        var rgbValue: UInt64 = 0
+        scanner.scanHexInt64(&rgbValue)
+        
+        let r = (rgbValue & 0xFF0000) >> 16
+        let g = (rgbValue & 0xFF00) >> 8
+        let b = rgbValue & 0xFF
+        
+        self.init(red: Double(r) / 0xFF, green: Double(g) / 0xFF, blue: Double(b) / 0xFF)
     }
 }
