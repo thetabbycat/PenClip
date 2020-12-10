@@ -50,12 +50,12 @@ struct PKCanvas: UIViewRepresentable {
         }
         canvas.becomeFirstResponder()
 
-        if let window = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first,
-            let toolPicker = PKToolPicker.shared(for: window) {
+
+            let toolPicker = PKToolPicker.init()
             toolPicker.addObserver(canvas)
 
             toolPicker.setVisible(true, forFirstResponder: canvas)
-        }
+        
 
         return canvas
     }
@@ -70,5 +70,67 @@ struct PKCanvas: UIViewRepresentable {
         }
 
         canvasView.tool = PKInkingTool(.pen, color: color, width: 10)
+    }
+}
+
+
+
+struct CanvasView {
+    @Binding var canvasView: PKCanvasView
+    @State var toolPicker = PKToolPicker()
+    var state = settings.data(forKey: "drawingState2")
+}
+
+// MARK: - UIViewRepresentable
+extension CanvasView: UIViewRepresentable {
+    func makeUIView(context: Context) -> PKCanvasView {
+        canvasView.tool = PKInkingTool(.pen, color: .gray, width: 10)
+        #if targetEnvironment(simulator)
+        canvasView.drawingPolicy = .anyInput
+        #endif
+        canvasView.delegate = context.coordinator
+        canvasView.isOpaque = false
+        canvasView.isScrollEnabled = false
+        canvasView.backgroundColor = .clear
+        do {
+            if state != nil {
+                canvasView.drawing = try PKDrawing(data: self.state!)
+            }
+        } catch {
+            print("error")
+        }
+        showToolPicker()
+        return canvasView
+    }
+    
+    func updateUIView(_ uiView: PKCanvasView, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(canvasView: $canvasView)
+    }
+}
+
+// MARK: - Private Methods
+private extension CanvasView {
+    func showToolPicker() {
+        toolPicker.setVisible(true, forFirstResponder: canvasView)
+        toolPicker.addObserver(canvasView)
+        canvasView.becomeFirstResponder()
+    }
+}
+
+// MARK: - Coordinator
+class Coordinator: NSObject {
+    var canvasView: Binding<PKCanvasView>
+    
+    // MARK: - Initializers
+    init(canvasView: Binding<PKCanvasView>) {
+        self.canvasView = canvasView
+    }
+}
+
+// MARK: - PKCanvasViewDelegate
+extension Coordinator: PKCanvasViewDelegate {
+    func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
     }
 }

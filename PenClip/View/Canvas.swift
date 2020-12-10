@@ -5,10 +5,8 @@
 //  Created by Steven J. Selcuk on 4.08.2020.
 //  Copyright © 2020 Steven J. Selcuk. All rights reserved.
 //
-import Foundation
-import PencilKit
 import SwiftUI
-import UIKit
+import PencilKit
 
 struct Canvas: View {
     @State var color = UIColor.black
@@ -18,13 +16,12 @@ struct Canvas: View {
     @State private var rect2: CGRect = screen
     @State private var uiimage: UIImage? = nil
     let imageSaver = ImageSaver()
-    @ObservedObject var saver = AutoSave()
 
     var isIpad = UIDevice.current.model.hasPrefix("iPad")
     var today = Date()
     var dateFormatter = DateFormatter()
-    @State var state = settings.data(forKey: "drawingState2")
-
+    var state = settings.data(forKey: "drawingState2")
+    @State private var canvasView = PKCanvasView()
     @State var show = false
     @State var editMode = false
     @State var currentScale: CGFloat = 1
@@ -32,40 +29,34 @@ struct Canvas: View {
     @State var currentOffset = CGSize.zero
     @State var previousOffset = CGSize.zero
     @State var degree = 0.0
-    @State var isSaved = AutoSave().isSaved
+    @State var isSaved = false
     // Default position for draggable circle menu (its now at upper right corner)
     @State private var dragAmount: CGPoint? = CGPoint(x: screen.width - (screen.width / 2 ), y: 80)
     @State var morphing = false
+    
+    init() {
+     
+    }
     
     var body: some View {
         let textButtons = [
 
             AnyView(IconButton(imageName: "trash", color: Color(hex: "DE316A"), buttonText: "Clear")
                 .onTapGesture {
-                    self.clear = false
-                    if self.clear == false {
-                        self.clear = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            self.clear = false
-                            self.saver.saveState()
-                        }
-                        //     if let appDomain = Bundle.main.bundleIdentifier {
-                        //         UserDefaults.standard.removePersistentDomain(forName: appDomain)
-                        //     }
-                    }
+                    self.deleteDrawing()
                 }),
             AnyView(IconButton(imageName: self.editMode ? "scribble" : "crop.rotate", color: Color(hex: "326BF1"), buttonText: self.editMode ? "Draw" : "Arrange")
                         .onTapGesture {
-                            self.saver.saveState()
+                            self.saveState()
                             self.editMode.toggle()
                         }),
-            AnyView(IconButton(imageName: "tray.2", color: Color(hex: "6F39DE"), buttonText: self.saver.isSaved ? "Saved" : "Save")
+            AnyView(IconButton(imageName: "tray.2", color: Color(hex: "6F39DE"), buttonText: self.isSaved ? "Saved" : "Save")
                 .onTapGesture {
-                    self.saver.saveState()
+                    self.saveState()
                 }),
             AnyView(IconButton(imageName: "square.and.arrow.up", color: Color(hex: "6BDFDB"), buttonText: "Export")
                 .onTapGesture {
-                    self.saver.saveState()
+                    self.saveState()
                     self.saveImage()
                     self.savePopup = true
                 }),
@@ -76,8 +67,8 @@ struct Canvas: View {
         let menu1 = FloatingButton(mainButtonView: mainButton1, buttons: textButtons)
             .circle()
             .spacing(20)
-            .startAngle(1 * .pi)
-            .endAngle(6 * .pi)
+            .startAngle(6 * .pi)
+            .endAngle(1 * .pi)
             .animation(.spring())
             .radius(90)
             .delays(delayDelta: 0.1)
@@ -86,7 +77,7 @@ struct Canvas: View {
 
         ZStack {
             ZStack {
-                PKCanvas(color: UIColor(named: "PencilColor")!, clear: self.$clear)
+                CanvasView(canvasView: $canvasView)
                     .edgesIgnoringSafeArea(.all)
                     .frame(width: screen.width, height: screen.height)
                     .aspectRatio(contentMode: ContentMode.fill)
@@ -158,12 +149,12 @@ struct Canvas: View {
         .background(Color("BGColor"))
         .edgesIgnoringSafeArea(.all)
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
-            self.saver.saveState()
+            self.saveState()
         }
         .onAppear {
             do {
                 if self.state != nil {
-                    canvas.drawing = try PKDrawing(data: self.state!)
+                    canvasView.drawing = try PKDrawing(data: self.state!)
                 }
 
             } catch {
@@ -194,9 +185,24 @@ struct Canvas: View {
         // @SEE utils for functions & extensions.
         // @SEE Assets for Paper BG color
 
-        let inputImage = canvas.drawing.image(from: imgRect, scale: UIScreen.main.scale / 2).imageWithColor(tintColor: UIColor(named: "PaperBG")!)
+        let inputImage = canvasView.drawing.image(from: imgRect, scale: UIScreen.main.scale / 2).imageWithColor(tintColor: UIColor(named: "PaperBG")!)
         imageSaver.writeToPhotoAlbum(image: inputImage)
     }
+    
+    func deleteDrawing() {
+        canvasView.drawing = PKDrawing()
+    }
+    
+    func saveState() {
+        let data = canvasView.drawing.dataRepresentation()
+        settings.set(data, forKey: "drawingState2")
+        isSaved = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.isSaved = false
+        }
+        //  print("State saved.")
+    }
+    
 }
 
 struct MainButton: View {

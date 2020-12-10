@@ -46,25 +46,6 @@ class ImageSaver: NSObject {
     }
 }
 
-class AutoSave: ObservableObject {
-    @Published var isSaved = false
-
-    init() {
-        let date = Date().addingTimeInterval(60)
-        let timer = Timer(fireAt: date, interval: 60, target: self, selector: #selector(saveState), userInfo: nil, repeats: true)
-        RunLoop.main.add(timer, forMode: .common)
-    }
-
-    @objc public func saveState() {
-        let data = canvas.drawing.dataRepresentation()
-        settings.set(data, forKey: "drawingState2")
-        isSaved = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            self.isSaved = false
-        }
-      //  print("State saved.")
-    }
-}
 
 class UIActivityViewControllerHost: UIViewController {
     var message = ""
